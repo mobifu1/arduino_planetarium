@@ -223,6 +223,8 @@ void draw_star_map(int delay_) {
 //--------------------------------------------------------------------------------------------------------------
 void draw_Information() {// text info
 
+  ScreenText(text_color, 5, 170, 1 , "Sun:");
+
 }
 //--------------------------------------------------------------------------------------------------------------
 void ScreenText(uint16_t color, int xtpos, int ytpos, int text_size , String text) {
