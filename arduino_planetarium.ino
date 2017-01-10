@@ -116,7 +116,7 @@ float dis;
 int day_ = 10;
 int month_ = 1;
 int year_ = 2017;
-int hour_ = 9;
+int hour_ = 20;
 int minute_ = 0;
 int seconds_ = 0;
 
@@ -240,14 +240,14 @@ void draw_object(int number) {
   int y = (int)(altitude * x_factor);
   y = (y_size / 2) - y;
 
-  if ( tft_position[number][0] != x || tft_position[number][1] != y) {
-    SetFilledCircle(BLACK , x , y , body_size);
-    tft_position[number][0] = x;
-    tft_position[number][1] = y;
-  }
+  //if ( tft_position[number][0] != x || tft_position[number][1] != y) {
+  //SetFilledCircle(BLACK , x , y , body_size);
+  tft_position[number][0] = x;
+  tft_position[number][1] = y;
+  //}
 
   if (altitude >= 0) {
-    if (number == 0)SetCircle(WHITE , x , y , body_size);        // Set object
+    if (number == 0)SetFilledCircle(WHITE , x , y , body_size);        // Set object
     if (number == 1)SetFilledCircle(GREENYELLOW , x , y , body_size);
     if (number == 2)SetFilledCircle(YELLOW , x , y , body_size);
     if (number == 3)SetFilledCircle(RED , x , y , body_size);
