@@ -279,7 +279,7 @@ void SerialClear() {
 //----------------------------------------------
 boolean getline(String phrase) { //HARD POLLING
 
-  char s[100];//simu: $GPRMC,201033,A,5335.5634,N,01039.3538,E,0.0,0.0,110117,0.4,E,A*19
+  char s[100];//simu: $GPRMC,205733,A,5335.5634,N,01039.3538,E,0.0,0.0,110117,0.4,E,A*19
   byte b, n;
   unsigned long t = millis();
 
@@ -432,9 +432,9 @@ void draw_star_map(int delay_) {
   float alt = object_position[2][1];//Sun
   if (alt < 0) {
     for (int i = 0; i < 30; ++i) { // star map
-      int randnumber_x = random(20, 220);
-      int randnumber_y = random(20, 220);
-      SetPoint(foreground_color, randnumber_x, randnumber_y - 60);
+      int randnumber_x = random(5, 235);
+      int randnumber_y = random(72, 155);
+      SetPoint(foreground_color, randnumber_x, randnumber_y);
       delay(delay_);
     }
   }
