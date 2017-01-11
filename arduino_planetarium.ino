@@ -73,6 +73,7 @@ int daylightsavingtime = 1; // add hour 1=winter  2=sommer
 int utc_hour;
 boolean valid_sync = false;
 boolean valid_signal = false;
+boolean update_ = false;
 //------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------
 
@@ -190,7 +191,6 @@ void loop() {
   }
 
   if (second() == 59) {
-
     utc_hour = hour() - daylightsavingtime;
     if (utc_hour < 0)utc_hour += 24;
     jd = get_julian_date (day(), month(), year(), utc_hour, minute(), second());//UTC
@@ -203,13 +203,16 @@ void loop() {
     get_object_position (5, jd, jd_frac);
     get_object_position (6, jd, jd_frac);
     get_object_position (7, jd, jd_frac);
-
+    update_ = true;
   }
 
   if (second() == 1) {
     if (valid_signal == true) {
       if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
-        gui_planetarium();
+        if (update_ == true) {
+          gui_planetarium();
+          update_ = false;
+        }
       }
     }
   }
@@ -220,6 +223,7 @@ void loop() {
 void gui_planetarium() {
 
   color_set(object_position[2][1]);
+  //tft.fillScreen(background_color);
   draw_coord_net();
   draw_Information();
   draw_star_map(1);
@@ -235,8 +239,6 @@ void gui_planetarium() {
 //--------------------------------------------------------------------------------------------------------------
 void RMC() { //TIME DATE
 
-  //$GPRMC,121000,A,4735.5634,N,00739.3538,E,0.0,0.0,060416,0.4,E,A*19
-  //setTime(12, 10, 0, 6, 4, 16);
   setTime(getparam(1).substring(0, 0 + 2).toInt(),
           getparam(1).substring(2, 2 + 2).toInt(),
           getparam(1).substring(4, 4 + 2).toInt(),
@@ -245,7 +247,7 @@ void RMC() { //TIME DATE
           getparam(9).substring(4, 4 + 2).toInt());
   time_t cet = CE.toLocal(now(), &tcr);
   setTime(cet);
-  Serial.println(String(getparam(1)));
+
   if (CE.locIsDST(cet)) { //ask for DST=Daylight saving time
     daylightsavingtime = 2; //true = 2 hour
   }
@@ -261,8 +263,7 @@ void RMC() { //TIME DATE
     minute_lon = getparam(5).substring(3, 5).toInt();//minute value
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       valid_sync = true;
-      SetFilledCircle(WHITE , 230, 10, 4);
-      Serial.println(String(valid_sync));
+      Serial.println("valid_sync");
     }
   }
   else {
@@ -278,7 +279,7 @@ void SerialClear() {
 //----------------------------------------------
 boolean getline(String phrase) { //HARD POLLING
 
-  char s[100];//simu: $GPRMC,121033,A,5335.5634,N,01039.3538,E,0.0,0.0,020117,0.4,E,A*19
+  char s[100];//simu: $GPRMC,201033,A,5335.5634,N,01039.3538,E,0.0,0.0,110117,0.4,E,A*19
   byte b, n;
   unsigned long t = millis();
 
@@ -302,8 +303,8 @@ boolean getline(String phrase) { //HARD POLLING
   Serial.println(Line);
   int index = Line.indexOf(phrase);
   if (index > -1) {
-    Serial.println("found:" + phrase);
-    Serial.println(Line);
+    //Serial.println("found:" + phrase);
+    //Serial.println(Line);
     return true;
   }
   return false;
@@ -324,18 +325,19 @@ boolean checksum() {
 //----------------------------------------------
 String getparam(int ix) {
   int c, cc = 0;
-  if (checksum())
-  { do
-    { c = Line.indexOf(',', cc);
-      if (c >= 0)cc = c + 1; else break;
-    } while (--ix);
-    return (Line.substring(c + 1, Line.indexOf(',', c + 1)));
-  }
+  // if (checksum()) {
+  do
+  { c = Line.indexOf(',', cc);
+    if (c >= 0)cc = c + 1; else break;
+  } while (--ix);
+  return (Line.substring(c + 1, Line.indexOf(',', c + 1)));
+  //}
   return F("xx"); //debug
 }
 //--------------------------------------------------------------------------------------------------------------
 void draw_coord_net() {
 
+  SetFilledRect(background_color , 0,  y_size / 2 - 89, 240, 89);
   //horizontal
   SetLines(foreground_color, 0, y_size / 2 - 90 , x_size - 20, y_size / 2 - 90 );  // 90 deg:zenith
   SetLines(foreground_color, 0, y_size / 2 - 60 , x_size - 20, y_size / 2 - 60 );  // 60 deg
@@ -343,7 +345,7 @@ void draw_coord_net() {
   SetLines(foreground_color, 0, y_size / 2 , x_size - 1, y_size / 2 );             //  0 deg:horizon
   SetLines(foreground_color, 0, y_size / 2 + 90 , x_size, y_size / 2 + 90 );       // -90 deg:down
   //vertical
-  SetLines(foreground_color, 0, y_size / 2 , 0, y_size / 2 - 90 );                //   0 deg:azimuth
+  SetLines(foreground_color, 0, y_size / 2  , 0, y_size / 2 - 90 );               //   0 deg:azimuth
   SetLines(foreground_color, 60, y_size / 2 , 60, y_size / 2 - 90 );              //  90 deg:azimuth
   SetLines(foreground_color, 119, y_size / 2 , 119, y_size / 2 - 90 );            // 180 deg:azimuth
   SetLines(foreground_color, 179, y_size / 2 , 179, y_size / 2 - 90 );            // 270 deg:azimuth
@@ -442,10 +444,12 @@ void draw_Information() {// text info
 
   char s[20];
   sprintf(s, "%02u.%02u.%04u   %02u:%02u", day(), month(), year(), hour(), minute());
+  SetFilledRect(background_color , 5, 0, 120, 10);
   ScreenText(text_color, 5, 5, 1 , s);
 
   float az = object_position[2][0];
   float alt = object_position[2][1];
+  SetFilledRect(background_color , 5, 255, 120, 10);
   ScreenText(text_color, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
   //raise next object:
@@ -454,6 +458,7 @@ void draw_Information() {// text info
     if (alt_object < 0 && alt_object > -20) {
       float az_object = object_position[i][0];
       if (az_object > 0 && az_object < 180) {
+        SetFilledRect(background_color, 5, 270, 120, 10);
         ScreenText(text_color, 5, 275, 1 , object_name[i]  + ": next raise");
         break;
       }
