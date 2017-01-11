@@ -58,6 +58,21 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 // If using the shield, all control and data lines are fixed, and
 // a simpler declaration can optionally be used:
 // Adafruit_TFTLCD tft;
+//--------------------------------------------
+//------- DATE-TIME --------------------------
+//--------------------------------------------
+#include <Time.h>
+#include <Timezone.h>
+TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
+TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
+Timezone CE(CEST, CET);
+TimeChangeRule *tcr;
+
+String Line = "";    // a string to hold incoming data
+int daylightsavingtime = 1; // add hour 1=winter  2=sommer
+int utc_hour;
+boolean valid_sync = false;
+boolean valid_signal = false;
 //------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------
 
@@ -105,20 +120,15 @@ float z_earth;
 float azimuth;
 float altitude;
 
-float lat = 53.5; //GPS Position of Hamburg in deg
-float lon = 10;
+float lat; //GPS Position of Hamburg in deg
+float lon;
+int minute_lat;
+int minute_lon;
 
 float ra; //deg
 float dec;
 float dis;
 
-//UTC:
-int day_ = 10;
-int month_ = 1;
-int year_ = 2017;
-int hour_ = 20;
-int minute_ = 0;
-int seconds_ = 0;
 
 //------------------------------------------------------------------------------------------------------------------
 
@@ -153,34 +163,58 @@ int y_size = 320;
 //--------------------------------------------------------------------------------------------------------------
 void setup() {
 
+  Line.reserve(100);
   tft.reset();
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
   ScreenText(WHITE, 0, 0, 1 , sw_version);
-  //draw_star_map(200);
+  draw_star_map(200);
 
-  //delay(3000);
+  delay(3000);
   tft.fillScreen(BLACK);
   Serial.begin(9600);
   Serial.println(sw_version);
 
-  jd = get_julian_date (day_, month_, year_, hour_, minute_, seconds_);//UTC
-  Serial.println("JD:" + String(jd, DEC) + "+" + String(jd_frac, DEC)); // jd = 2457761.375000;
-  get_object_position (2, jd, jd_frac);//earth
-  get_object_position (0, jd, jd_frac);
-  get_object_position (1, jd, jd_frac);
-  get_object_position (3, jd, jd_frac);
-  get_object_position (4, jd, jd_frac);
-  get_object_position (5, jd, jd_frac);
-  get_object_position (6, jd, jd_frac);
-  get_object_position (7, jd, jd_frac);
-
-  gui_planetarium();
 }
 //--------------------------------------------------------------------------------------------------------------
 void loop() {
 
+  static int os = -1;
 
+  if (!(os % 4))if (getline(F("$GPRMC")))RMC();
+  SerialClear();
+
+
+  if (second() != os) { //every second
+
+  }
+
+  if (second() == 59) {
+
+    utc_hour = hour() - daylightsavingtime;
+    if (utc_hour < 0)utc_hour += 24;
+    jd = get_julian_date (day(), month(), year(), utc_hour, minute(), second());//UTC
+    //Serial.println("JD:" + String(jd, DEC) + "+" + String(jd_frac, DEC)); // jd = 2457761.375000;
+    get_object_position (2, jd, jd_frac);//earth
+    get_object_position (0, jd, jd_frac);
+    get_object_position (1, jd, jd_frac);
+    get_object_position (3, jd, jd_frac);
+    get_object_position (4, jd, jd_frac);
+    get_object_position (5, jd, jd_frac);
+    get_object_position (6, jd, jd_frac);
+    get_object_position (7, jd, jd_frac);
+
+  }
+
+  if (second() == 1) {
+    if (valid_signal == true) {
+      if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+        gui_planetarium();
+      }
+    }
+  }
+
+  os = second();
 }
 //--------------------------------------------------------------------------------------------------------------
 void gui_planetarium() {
@@ -197,6 +231,107 @@ void gui_planetarium() {
   draw_object(5);
   draw_object(6);
   draw_object(7);
+}
+//--------------------------------------------------------------------------------------------------------------
+void RMC() { //TIME DATE
+
+  //$GPRMC,121000,A,4735.5634,N,00739.3538,E,0.0,0.0,060416,0.4,E,A*19
+  //setTime(12, 10, 0, 6, 4, 16);
+  setTime(getparam(1).substring(0, 0 + 2).toInt(),
+          getparam(1).substring(2, 2 + 2).toInt(),
+          getparam(1).substring(4, 4 + 2).toInt(),
+          getparam(9).substring(0, 0 + 2).toInt(),
+          getparam(9).substring(2, 2 + 2).toInt(),
+          getparam(9).substring(4, 4 + 2).toInt());
+  time_t cet = CE.toLocal(now(), &tcr);
+  setTime(cet);
+  Serial.println(String(getparam(1)));
+  if (CE.locIsDST(cet)) { //ask for DST=Daylight saving time
+    daylightsavingtime = 2; //true = 2 hour
+  }
+  else {
+    daylightsavingtime = 1;//false = 1 hour
+  }
+
+  if (getparam(2) == "A") { //valid GPS-signal  A/V
+    valid_signal = true;
+    lat = getparam(3).substring(0, 2).toInt();
+    lon = getparam(5).substring(0, 3).toInt();
+    minute_lat = getparam(3).substring(2, 4).toInt();//minute value
+    minute_lon = getparam(5).substring(3, 5).toInt();//minute value
+    if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
+      valid_sync = true;
+      SetFilledCircle(WHITE , 230, 10, 4);
+      Serial.println(String(valid_sync));
+    }
+  }
+  else {
+    valid_signal = false;
+  }
+}
+//----------------------------------------------
+//--------------RS232-ROUTINEN------------------
+//----------------------------------------------
+void SerialClear() {
+  while (Serial.available())Serial.read();
+}
+//----------------------------------------------
+boolean getline(String phrase) { //HARD POLLING
+
+  char s[100];//simu: $GPRMC,121033,A,5335.5634,N,01039.3538,E,0.0,0.0,020117,0.4,E,A*19
+  byte b, n;
+  unsigned long t = millis();
+
+  for (unsigned int i = 0; i < sizeof(s); i++) {
+    s[i] = 0;
+  }
+  Line = "";
+  do {
+    b = Serial.read();
+    if (millis() > (t + 100))return false;
+  }
+  while (b != '$');
+
+  s[0] = b;
+  n = Serial.readBytesUntil('\n', &s[1], 90);
+  s[n] = 0;
+
+  for (int i = 0; i < n; i++) {
+    Line += s[i];
+  }
+  Serial.println(Line);
+  int index = Line.indexOf(phrase);
+  if (index > -1) {
+    Serial.println("found:" + phrase);
+    Serial.println(Line);
+    return true;
+  }
+  return false;
+}
+
+#define hex(i)  ((i<=9) ? ('0'+i): ('A'- 10 + i))
+//----------------------------------------------
+boolean checksum() {
+  byte b = 0; int e;
+  e = Line.indexOf('*');
+  if (e > 10)
+  { for (int i = 1; i < e; i++)b ^= Line[i];
+    if ((hex((b & 15)) == Line[e + 2]) &&
+        (hex(b / 16) == Line[e + 1]))return true;
+  }
+  return false;
+}
+//----------------------------------------------
+String getparam(int ix) {
+  int c, cc = 0;
+  if (checksum())
+  { do
+    { c = Line.indexOf(',', cc);
+      if (c >= 0)cc = c + 1; else break;
+    } while (--ix);
+    return (Line.substring(c + 1, Line.indexOf(',', c + 1)));
+  }
+  return F("xx"); //debug
 }
 //--------------------------------------------------------------------------------------------------------------
 void draw_coord_net() {
@@ -306,7 +441,7 @@ void draw_star_map(int delay_) {
 void draw_Information() {// text info
 
   char s[20];
-  sprintf(s, "%02u.%02u.%04u   %02u:%02u", day_, month_, year_, hour_, minute_);
+  sprintf(s, "%02u.%02u.%04u   %02u:%02u", day(), month(), year(), hour(), minute());
   ScreenText(text_color, 5, 5, 1 , s);
 
   float az = object_position[2][0];
