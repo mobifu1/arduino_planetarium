@@ -123,8 +123,6 @@ float altitude;
 
 float lat; //GPS Position of Hamburg in deg
 float lon;
-int minute_lat;
-int minute_lon;
 
 float ra; //deg
 float dec;
@@ -185,25 +183,26 @@ void loop() {
   if (!(os % 4))if (getline(F("$GPRMC")))RMC();
   SerialClear();
 
-
   if (second() != os) { //every second
 
   }
 
   if (second() == 59) {
-    utc_hour = hour() - daylightsavingtime;
-    if (utc_hour < 0)utc_hour += 24;
-    jd = get_julian_date (day(), month(), year(), utc_hour, minute(), second());//UTC
-    //Serial.println("JD:" + String(jd, DEC) + "+" + String(jd_frac, DEC)); // jd = 2457761.375000;
-    get_object_position (2, jd, jd_frac);//earth
-    get_object_position (0, jd, jd_frac);
-    get_object_position (1, jd, jd_frac);
-    get_object_position (3, jd, jd_frac);
-    get_object_position (4, jd, jd_frac);
-    get_object_position (5, jd, jd_frac);
-    get_object_position (6, jd, jd_frac);
-    get_object_position (7, jd, jd_frac);
-    update_ = true;
+    if (valid_signal == true) {
+      utc_hour = hour() - daylightsavingtime;
+      if (utc_hour < 0)utc_hour += 24;
+      jd = get_julian_date (day(), month(), year(), utc_hour, minute(), second());//UTC
+      //Serial.println("JD:" + String(jd, DEC) + "+" + String(jd_frac, DEC)); // jd = 2457761.375000;
+      get_object_position (2, jd, jd_frac);//earth
+      get_object_position (0, jd, jd_frac);
+      get_object_position (1, jd, jd_frac);
+      get_object_position (3, jd, jd_frac);
+      get_object_position (4, jd, jd_frac);
+      get_object_position (5, jd, jd_frac);
+      get_object_position (6, jd, jd_frac);
+      get_object_position (7, jd, jd_frac);
+      update_ = true;
+    }
   }
 
   if (second() == 1) {
@@ -236,7 +235,10 @@ void gui_planetarium() {
   draw_object(6);
   draw_object(7);
 }
-//--------------------------------------------------------------------------------------------------------------
+//##############################################################################################################
+//##############################################################################################################
+// gps data:
+
 void RMC() { //TIME DATE
 
   setTime(getparam(1).substring(0, 0 + 2).toInt(),
@@ -259,8 +261,11 @@ void RMC() { //TIME DATE
     valid_signal = true;
     lat = getparam(3).substring(0, 2).toInt();
     lon = getparam(5).substring(0, 3).toInt();
-    minute_lat = getparam(3).substring(2, 4).toInt();//minute value
-    minute_lon = getparam(5).substring(3, 5).toInt();//minute value
+    float minute_lat = getparam(3).substring(2, 4).toInt();//minute value
+    float minute_lon = getparam(5).substring(3, 5).toInt();//minute value
+    lat += (minute_lat * 10 / 6) / 100;
+    lon += (minute_lat * 10 / 6) / 100;
+
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       valid_sync = true;
       Serial.println("valid_sync");
@@ -334,7 +339,10 @@ String getparam(int ix) {
   //}
   return F("xx"); //debug
 }
-//--------------------------------------------------------------------------------------------------------------
+//##############################################################################################################
+//##############################################################################################################
+//planetarium gui:
+
 void draw_coord_net() {
 
   SetFilledRect(background_color , 0,  y_size / 2 - 89, 240, 89);
@@ -444,8 +452,9 @@ void draw_Information() {// text info
 
   char s[20];
   sprintf(s, "%02u.%02u.%04u   %02u:%02u", day(), month(), year(), hour(), minute());
-  SetFilledRect(background_color , 5, 0, 120, 10);
+  SetFilledRect(background_color , 5, 0, 239, 10);
   ScreenText(text_color, 5, 5, 1 , s);
+  ScreenText(text_color, 130, 5, 1 , String(lat, 2) + "/" + String(lon, 2));
 
   float az = object_position[2][0];
   float alt = object_position[2][1];
@@ -460,7 +469,7 @@ void draw_Information() {// text info
     float altitude = object_position[i][1];
     float azimuth = object_position[i][0];
     if (altitude < 0 && altitude > -20 && azimuth > 0 && azimuth < 180) {
-    if (altitude >= alt_object) {
+      if (altitude >= alt_object) {
         alt_object = altitude;
         object_number = i;
       }
@@ -504,6 +513,8 @@ void SetFilledCircle(uint16_t color , int xcpos, int ycpos, int radius) {
 }
 //##############################################################################################################
 //##############################################################################################################
+//object calculation:
+
 float get_julian_date (float day_, float month_, float year_, float hour_, float minute_, float seconds_) { // UTC
 
   if (month_ <= 2) {
