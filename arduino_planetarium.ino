@@ -453,16 +453,22 @@ void draw_Information() {// text info
   ScreenText(text_color, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
   //raise next object:
+  float alt_object = -20;
+  int object_number = -1;
+
   for (int i = 0 ; i < 8; i++) {
-    float alt_object = object_position[i][1];
-    if (alt_object < 0 && alt_object > -20) {
-      float az_object = object_position[i][0];
-      if (az_object > 0 && az_object < 180) {
-        SetFilledRect(background_color, 5, 270, 120, 10);
-        ScreenText(text_color, 5, 275, 1 , object_name[i]  + ": next raise");
-        break;
+    float altitude = object_position[i][1];
+    float azimuth = object_position[i][0];
+    if (altitude < 0 && altitude > -20 && azimuth > 0 && azimuth < 180) {
+    if (altitude >= alt_object) {
+        alt_object = altitude;
+        object_number = i;
       }
     }
+  }
+  if (object_number > -1) {
+    SetFilledRect(background_color, 5, 270, 120, 10);
+    ScreenText(text_color, 5, 275, 1 , object_name[object_number]  + ": next raise");
   }
 }
 //--------------------------------------------------------------------------------------------------------------
