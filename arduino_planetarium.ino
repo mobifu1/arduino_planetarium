@@ -154,7 +154,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 0.1 Beta";
+String sw_version = "Version: 0.9 Beta";
 
 //Display Size:
 int x_size = 240;
@@ -264,7 +264,7 @@ void RMC() { //TIME DATE
     float minute_lat = getparam(3).substring(2, 4).toInt();//minute value
     float minute_lon = getparam(5).substring(3, 5).toInt();//minute value
     lat += (minute_lat * 10 / 6) / 100;
-    lon += (minute_lat * 10 / 6) / 100;
+    lon += (minute_lon * 10 / 6) / 100;
 
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       valid_sync = true;
