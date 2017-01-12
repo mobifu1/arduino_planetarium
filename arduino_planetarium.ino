@@ -452,13 +452,13 @@ void draw_Information() {// text info
 
   char s[20];
   sprintf(s, "%02u.%02u.%04u   %02u:%02u", day(), month(), year(), hour(), minute());
-  SetFilledRect(background_color , 5, 0, 239, 10);
+  SetFilledRect(background_color , 0, 5, 239, 8);
   ScreenText(text_color, 5, 5, 1 , s);
   ScreenText(text_color, 130, 5, 1 , String(lat, 2) + "/" + String(lon, 2));
 
   float az = object_position[2][0];
   float alt = object_position[2][1];
-  SetFilledRect(background_color , 5, 255, 120, 10);
+  SetFilledRect(background_color , 0, 260, 239, 8);
   ScreenText(text_color, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
   //raise next object:
@@ -476,7 +476,7 @@ void draw_Information() {// text info
     }
   }
   if (object_number > -1) {
-    SetFilledRect(background_color, 5, 270, 120, 10);
+    SetFilledRect(background_color, 0, 275, 239, 8);
     ScreenText(text_color, 5, 275, 1 , object_name[object_number]  + ": next raise");
   }
 }
