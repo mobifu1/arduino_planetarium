@@ -5,7 +5,7 @@
 // Author: Andreas Jahnke, aajahnke@aol.com
 //------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------
-#include <Adafruit_GFX.h>    // Core graphics library
+//#include <Adafruit_GFX.h>    // Core graphics library
 #include <Adafruit_TFTLCD.h> // Hardware-specific library
 // The control pins for the LCD can be assigned to any digital or
 // analog pins...but we'll use the analog pins as this allows us to
@@ -139,7 +139,7 @@ float object_position[8][4] = {// azimuth, altitude, distance, bodysize
   {0, 0, 0, 3},    // Jupiter
   {0, 0, 0, 3},    // Saturn
   {0, 5, 0, 2},    // Uranus
-  {0, 0, 0, 2},    // Neptun
+  {0, 0, 0, 1},    // Neptun
 };
 
 int tft_position[8][2] = {//x, y
@@ -218,7 +218,6 @@ void loop() {
 void gui_planetarium() {
 
   color_set(object_position[2][1]);
-  //tft.fillScreen(background_color);
   draw_coord_net();
   draw_Information();
   draw_star_map(1);
@@ -383,11 +382,8 @@ void draw_object(int number) {
   int y = (int)(altitude * x_factor);
   y = (y_size / 2) - y;
 
-  //if ( tft_position[number][0] != x || tft_position[number][1] != y) {
-  //SetFilledCircle(BLACK , x , y , body_size);
   tft_position[number][0] = x;
   tft_position[number][1] = y;
-  //}
 
   if (altitude >= 0) {
     if (number == 0)SetFilledCircle(WHITE , x , y , body_size);        // Set object
