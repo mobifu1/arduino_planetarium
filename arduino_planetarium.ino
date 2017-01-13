@@ -475,8 +475,8 @@ void draw_Information() {// text info
       }
     }
   }
+  SetFilledRect(background_color, 0, 275, 239, 8);
   if (object_number > -1) {
-    SetFilledRect(background_color, 0, 275, 239, 8);
     ScreenText(text_color, 5, 275, 1 , object_name[object_number]  + ": next raise");
   }
 }
