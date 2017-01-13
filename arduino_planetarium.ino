@@ -166,13 +166,9 @@ void setup() {
   tft.reset();
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
-  ScreenText(WHITE, 0, 0, 1 , sw_version);
-  draw_star_map(200);
-
-  delay(3000);
-  tft.fillScreen(BLACK);
+  ScreenText(WHITE, 5, 5, 1 , sw_version);
   Serial.begin(9600);
-  Serial.println(sw_version);
+  //Serial.println(sw_version);
 
 }
 //--------------------------------------------------------------------------------------------------------------
@@ -268,7 +264,7 @@ void RMC() { //TIME DATE
 
     if ((lat > 0) && (lon > 0) && (lat < 90) && (lon < 180)) {
       valid_sync = true;
-      Serial.println("valid_sync");
+      //Serial.println("valid_sync");
     }
   }
   else {
@@ -371,6 +367,8 @@ void draw_coord_net() {
   ScreenText(foreground_color, 239 - 8, y_size / 2 - 100, 1 , "N");
   //earth ground
   SetFilledRect(earthground_color , 0,  y_size / 2 + 1, 240, 89);
+  //info window
+  SetFilledRect(BLACK , 0,  241, 240, 78);
 }
 //--------------------------------------------------------------------------------------------------------------
 void draw_object(int number) {
@@ -417,7 +415,7 @@ void color_set(float sun_altitude) {
   if (sun_altitude >= 0) {
     foreground_color = BLACK;
     background_color = WHITE;
-    earthground_color = GREEN;
+    earthground_color = DARKGREEN;
     text_color = BLACK;
   }
   if (sun_altitude >= 0 && sun_altitude <= 3) {
@@ -454,14 +452,14 @@ void draw_Information() {// text info
   sprintf(s, "%02u.%02u.%04u   %02u:%02u", day(), month(), year(), hour(), minute());
   SetFilledRect(background_color , 0, 5, 239, 8);
   ScreenText(text_color, 5, 5, 1 , s);
-  ScreenText(text_color, 130, 5, 1 , String(lat, 2) + "/" + String(lon, 2));
+  ScreenText(text_color, 130, 5, 1 , "N" + String(lat, 2) + "/E" + String(lon, 2));
 
   float az = object_position[2][0];
   float alt = object_position[2][1];
   SetFilledRect(background_color , 0, 260, 239, 8);
-  ScreenText(text_color, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
+  ScreenText(WHITE, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
-  //raise next object:
+  //rise next object:
   float alt_object = -20;
   int object_number = -1;
 
@@ -475,9 +473,28 @@ void draw_Information() {// text info
       }
     }
   }
-  SetFilledRect(background_color, 0, 275, 239, 8);
+  SetFilledRect(BLACK, 0, 275, 239, 8);
   if (object_number > -1) {
-    ScreenText(text_color, 5, 275, 1 , object_name[object_number]  + ": next raise");
+    ScreenText(WHITE, 5, 275, 1 , object_name[object_number]  + ": next rise");
+  }
+
+  //set next object:
+  alt_object = 20;
+  object_number = -1;
+
+  for (int i = 0 ; i < 8; i++) {
+    float altitude = object_position[i][1];
+    float azimuth = object_position[i][0];
+    if (altitude > 0 && altitude < 20 && azimuth > 180 && azimuth < 360) {
+      if (altitude <= alt_object) {
+        alt_object = altitude;
+        object_number = i;
+      }
+    }
+  }
+  SetFilledRect(BLACK, 0, 290, 239, 8);
+  if (object_number > -1) {
+    ScreenText(WHITE, 5, 290, 1 , object_name[object_number]  + ": next set");
   }
 }
 //--------------------------------------------------------------------------------------------------------------
@@ -721,34 +738,34 @@ void calc_vector(float x, float y, float z, String mode) {
 //------------------------------------------------------------------------------------------------------------------
 void format_angle(float angle, String format) {
 
-  int d = 0;
-  int m = 0;
-  int s = 0;
-  float rest = 0;
-  String sign = "";
-
-  if (format == F("degrees") || format == F("degrees-latitude")) {
-
-    rest = calc_format_angle_deg (angle);
-
-    if (format == F("degrees-latitude") && rest > 90) {
-      rest -= 360;
-    }
-    if (rest >= 0) {
-      sign = "+";
-    }
-    else {
-      sign = "-";
-    }
-
-    rest = fabs(rest);
-    d = (int)(rest);
-    rest = (rest - (float)d) * 60;
-    m = (int)(rest);
-    rest = (rest - (float)m) * 60;
-    s = (int)rest;
-    //Serial.println(sign + String(d) + ":" + String(m) + ":" + String(s));
-  }
+  //  int d = 0;
+  //  int m = 0;
+  //  int s = 0;
+  //  float rest = 0;
+  //  String sign = "";
+  //
+  //  if (format == F("degrees") || format == F("degrees-latitude")) {
+  //
+  //    rest = calc_format_angle_deg (angle);
+  //
+  //    if (format == F("degrees-latitude") && rest > 90) {
+  //      rest -= 360;
+  //    }
+  //    if (rest >= 0) {
+  //      sign = "+";
+  //    }
+  //    else {
+  //      sign = "-";
+  //    }
+  //
+  //    rest = fabs(rest);
+  //    d = (int)(rest);
+  //    rest = (rest - (float)d) * 60;
+  //    m = (int)(rest);
+  //    rest = (rest - (float)m) * 60;
+  //    s = (int)rest;
+  //    Serial.println(sign + String(d) + ":" + String(m) + ":" + String(s));
+  //   }
 }
 //--------------------------------------------------------------------------------------------------------------------
 void rot_x(float alpha) {
