@@ -366,7 +366,7 @@ void draw_coord_net() {
   //earth ground
   SetFilledRect(earthground_color , 0,  y_size / 2 + 1, 240, 89);
   //info window
-  SetFilledRect(BLACK , 0,  241, 240, 78);
+  SetFilledRect(BLACK , 0,  241, 240, 79);
 }
 //--------------------------------------------------------------------------------------------------------------
 void draw_object(int number) {
@@ -384,21 +384,21 @@ void draw_object(int number) {
   tft_position[number][0] = x;
   tft_position[number][1] = y;
 
-  if (altitude >= 0) {
-    if (number == 0)SetFilledCircle(WHITE , x , y , body_size);        // Set object
+  if (altitude >= 0) {//rise object
+    if (number == 0)SetFilledCircle(text_color , x , y , body_size);        // Set object
     if (number == 1)SetFilledCircle(GREENYELLOW , x , y , body_size);
     if (number == 2)SetFilledCircle(YELLOW , x , y , body_size);
     if (number == 3)SetFilledCircle(RED , x , y , body_size);
     if (number == 4)SetFilledCircle(MAROON , x , y , body_size);
     if (number == 5) {
-      SetFilledCircle(MAGENTA , x , y , body_size);
+      SetFilledCircle(MAGENTA , x , y , body_size);//saturn
       SetLines(BLACK , x - 4, y, x + 4, y);
     }
     if (number == 6)SetFilledCircle(BLUE , x , y , body_size);
     if (number == 7)SetFilledCircle(PURPLE , x , y , body_size);
   }
   else {
-    SetFilledCircle(BLACK , x , y , body_size);
+    SetFilledCircle(BLACK , x , y , body_size);//set object
     if (number == 5)SetLines(BLACK , x - 4, y, x + 4, y);
   }
 }
