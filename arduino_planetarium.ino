@@ -87,7 +87,6 @@ boolean update_ = false;
 
 // Tables:
 String object_name[8] = {"Mercury", "Venus", "Sun", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"};
-//String star_name[1] = {"Sun"};
 
 // http://ssd.jpl.nasa.gov/txt/aprx_pos_planets.pdf
 const float object_data[8][12] = {// a, aΔ, e, eΔ, i, iΔ,  L, LΔ, ω, ωΔ, Ω, ΩΔ  >>> L2000
@@ -408,19 +407,19 @@ void color_set(float sun_altitude) {
 
   unsigned int color = background_color;
 
-  if (sun_altitude >= 0) {
+  if (sun_altitude >= -0.5) {                     //day   0.5deg = sun refraction
     foreground_color = BLACK;
     background_color = WHITE;
     earthground_color = DARKGREEN;
     text_color = BLACK;
   }
-  if (sun_altitude >= 0 && sun_altitude <= 3) {
+  if (sun_altitude > -0.5 && sun_altitude <= -5) {//twilight
     foreground_color = WHITE;
     background_color = BLUE;
     earthground_color = DARKGREEN;
     text_color = WHITE;
   }
-  if (sun_altitude < 0) {
+  if (sun_altitude < -5) {                       //dark
     foreground_color = GRAY;
     background_color = BLACK;
     earthground_color = GRAY;
@@ -452,7 +451,7 @@ void draw_Information() {// text info
 
   float az = object_position[2][0];
   float alt = object_position[2][1];
-  SetFilledRect(background_color , 0, 260, 239, 8);
+  SetFilledRect(BLACK , 0, 260, 239, 8);
   ScreenText(WHITE, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
   //rise next object:
