@@ -413,13 +413,13 @@ void color_set(float sun_altitude) {
     earthground_color = DARKGREEN;
     text_color = BLACK;
   }
-  if (sun_altitude > -0.5 && sun_altitude <= -5) {//twilight
+  if (sun_altitude < -0.5 && sun_altitude > -5) {//twilight
     foreground_color = WHITE;
     background_color = BLUE;
     earthground_color = DARKGREEN;
     text_color = WHITE;
   }
-  if (sun_altitude < -5) {                       //dark
+  if (sun_altitude <= -5) {                      //dark
     foreground_color = GRAY;
     background_color = BLACK;
     earthground_color = GRAY;
