@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------------------------------------------------------------------------
-// Calculation the Positions of Planets by Circle Orbit in the Solarsystem between Year 2000-2100
+// Calculation of the ephemeride Positions of Planets by Circle Orbit in the Solarsystem between Year 2000-2100
 // all results are tested with Stellarium on Linux :-)
 // Author: Andreas Jahnke, aajahnke@aol.com
 //------------------------------------------------------------------------------------------------------------------
@@ -153,7 +153,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 0.9 Beta";
+String sw_version = "Version: 1.0-Beta";
 
 //Display Size:
 int x_size = 240;
@@ -165,7 +165,7 @@ void setup() {
   tft.reset();
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
-  ScreenText(WHITE, 5, 5, 1 , sw_version);
+  //ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
   Serial.begin(9600);
   //Serial.println(sw_version);
 
@@ -377,7 +377,7 @@ void draw_object(int number) {
   float altitude = object_position[number][1];
   int body_size = (int)object_position[number][3];
 
-  int x = (int)(azimuth * y_factor); //239=360deg
+  int x = (int)(azimuth * y_factor); //239px=360deg
   int y = (int)(altitude * x_factor);
   y = (y_size / 2) - y;
 
@@ -387,7 +387,18 @@ void draw_object(int number) {
   if (altitude >= 0) {//rise object
     if (number == 0)SetFilledCircle(text_color , x , y , body_size);        // Set object
     if (number == 1)SetFilledCircle(GREENYELLOW , x , y , body_size);
-    if (number == 2)SetFilledCircle(YELLOW , x , y , body_size);
+    if (number == 2) {
+      SetFilledCircle(YELLOW , x , y , body_size); // sun position
+      // calc sun oppsition position
+      x = x + 119;
+      if (x > x_size) x = x - x_size;
+      y = ((y - (y_size / 2)) * -1) + y_size / 2;
+      //SetCircle(LIGHTGRAY , x , y , 10); // sun opposite position
+      SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
+      SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
+      SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
+      SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
+    }
     if (number == 3)SetFilledCircle(RED , x , y , body_size);
     if (number == 4)SetFilledCircle(MAROON , x , y , body_size);
     if (number == 5) {
