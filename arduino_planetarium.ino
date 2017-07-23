@@ -153,7 +153,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 1.0-Beta";
+String sw_version = "Version: 1.0-RC";
 
 //Display Size:
 int x_size = 240;
@@ -165,7 +165,7 @@ void setup() {
   tft.reset();
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
-  //ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
+  ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
   Serial.begin(9600);
   //Serial.println(sw_version);
 
@@ -387,18 +387,7 @@ void draw_object(int number) {
   if (altitude >= 0) {//rise object
     if (number == 0)SetFilledCircle(text_color , x , y , body_size);        // Set object
     if (number == 1)SetFilledCircle(GREENYELLOW , x , y , body_size);
-    if (number == 2) {
-      SetFilledCircle(YELLOW , x , y , body_size); // sun position
-      // calc sun oppsition position
-      x = x + 119;
-      if (x > x_size) x = x - x_size;
-      y = ((y - (y_size / 2)) * -1) + y_size / 2;
-      //SetCircle(LIGHTGRAY , x , y , 10); // sun opposite position
-      SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
-      SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
-      SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
-      SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
-    }
+    if (number == 2) SetFilledCircle(YELLOW , x , y , body_size); // sun position
     if (number == 3)SetFilledCircle(RED , x , y , body_size);
     if (number == 4)SetFilledCircle(MAROON , x , y , body_size);
     if (number == 5) {
@@ -411,6 +400,16 @@ void draw_object(int number) {
   else {
     SetFilledCircle(BLACK , x , y , body_size);//set object
     if (number == 5)SetLines(BLACK , x - 4, y, x + 4, y);
+  }
+  if (number == 2) { // calc sun oppsition position
+    x = x + 119;
+    if (x > x_size) x = x - x_size;
+    y = ((y - (y_size / 2)) * -1) + y_size / 2;
+    //SetCircle(LIGHTGRAY , x , y , 10); // sun opposite position
+    SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
+    SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
+    SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
+    SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
   }
 }
 //--------------------------------------------------------------------------------------------------------------
