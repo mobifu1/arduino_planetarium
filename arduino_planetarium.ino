@@ -166,8 +166,8 @@ void setup() {
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
   ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
-  //Serial.begin(9600);
-  //Serial.println(sw_version);
+  Serial.begin(9600);
+  Serial.println(sw_version);
 
 }
 //--------------------------------------------------------------------------------------------------------------
