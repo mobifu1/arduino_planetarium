@@ -153,7 +153,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 1.0-RC";
+String sw_version = "Version: 1.1-Beta";
 
 //Display Size:
 int x_size = 240;
@@ -166,7 +166,7 @@ void setup() {
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
   ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
-  Serial.begin(9600);
+  //Serial.begin(9600);
   //Serial.println(sw_version);
 
 }
@@ -220,14 +220,7 @@ void gui_planetarium() {
   draw_coord_net();
   draw_Information();
   draw_star_map(1);
-  draw_object(0);
-  draw_object(1);
-  draw_object(2);
-  draw_object(3);
-  draw_object(4);
-  draw_object(5);
-  draw_object(6);
-  draw_object(7);
+  draw_all_objects();
 }
 //##############################################################################################################
 //##############################################################################################################
@@ -413,6 +406,37 @@ void draw_object(int number) {
   }
 }
 //--------------------------------------------------------------------------------------------------------------
+void draw_all_objects() {
+
+  //sorted by distance:
+  float value = 0;
+  float sort_list[8][2] = {};// position, distance
+
+  for (int i = 0; i < 8; i++) {
+    sort_list[i][0] = float(i); // index
+    sort_list[i][1] =  object_position[i][2];// distance
+  }
+
+  for (int rounds = 0; rounds < 8; rounds++) {// simple sorting algorithm
+    for (int index = 0; index < 7; index++) {
+      if (sort_list[index][1] < sort_list[index + 1][1]) {
+
+        value = sort_list[index][1];
+        sort_list[index][1] = sort_list[index + 1][1];
+        sort_list[index + 1][1] = value;
+
+        value = sort_list[index][0];
+        sort_list[index][0] = sort_list[index + 1][0];
+        sort_list[index + 1][0] = value;
+      }
+    }
+  }
+
+  for (int j = 0; j < 8; j++) {
+    draw_object(int(sort_list[j][0]));
+  }
+}
+//--------------------------------------------------------------------------------------------------------------
 void color_set(float sun_altitude) {
 
   unsigned int color = background_color;
@@ -518,9 +542,9 @@ void SetPoint(uint16_t color, int xppos, int yppos) {
   tft.drawPixel(xppos, yppos, color);
 }
 //--------------------------------------------------------------------------------------------------------------
-void SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
-  tft.drawRect(xr1pos, yr1pos, xr2width, yr2hight, color);
-}
+//void SetRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
+//  tft.drawRect(xr1pos, yr1pos, xr2width, yr2hight, color);
+//}
 //--------------------------------------------------------------------------------------------------------------
 void SetFilledRect(uint16_t color , int xr1pos, int yr1pos, int xr2width, int yr2hight) {
   tft.fillRect(xr1pos, yr1pos, xr2width, yr2hight, color);
@@ -725,7 +749,7 @@ void calc_vector(float x, float y, float z, String mode) {
   lon = calc_format_angle_deg (lon);
   ra = lon;
   //Serial.println("LON:" + String(lon, DEC));
-  format_angle(lon, F("degrees"));
+  //format_angle(lon, F("degrees"));
 
   //get Latitude:
   float lat = atan2(z, (sqrt(x * x + y * y)));
@@ -733,7 +757,7 @@ void calc_vector(float x, float y, float z, String mode) {
   lat = calc_format_angle_deg (lat);
   dec = lat;
   //Serial.println("LAT:" + String(lat, DEC));
-  format_angle(lat, F("degrees-latitude"));
+  //format_angle(lat, F("degrees-latitude"));
 
   //getDistance:
   float dist = sqrt(x * x + y * y + z * z);
@@ -741,37 +765,37 @@ void calc_vector(float x, float y, float z, String mode) {
   //Serial.println("DIS:" + String(dist, DEC));
 }
 //------------------------------------------------------------------------------------------------------------------
-void format_angle(float angle, String format) {
-
-  //  int d = 0;
-  //  int m = 0;
-  //  int s = 0;
-  //  float rest = 0;
-  //  String sign = "";
-  //
-  //  if (format == F("degrees") || format == F("degrees-latitude")) {
-  //
-  //    rest = calc_format_angle_deg (angle);
-  //
-  //    if (format == F("degrees-latitude") && rest > 90) {
-  //      rest -= 360;
-  //    }
-  //    if (rest >= 0) {
-  //      sign = "+";
-  //    }
-  //    else {
-  //      sign = "-";
-  //    }
-  //
-  //    rest = fabs(rest);
-  //    d = (int)(rest);
-  //    rest = (rest - (float)d) * 60;
-  //    m = (int)(rest);
-  //    rest = (rest - (float)m) * 60;
-  //    s = (int)rest;
-  //    Serial.println(sign + String(d) + ":" + String(m) + ":" + String(s));
-  //   }
-}
+//void format_angle(float angle, String format) {
+//
+//  int d = 0;
+//  int m = 0;
+//  int s = 0;
+//  float rest = 0;
+//  String sign = "";
+//
+//  if (format == F("degrees") || format == F("degrees-latitude")) {
+//
+//    rest = calc_format_angle_deg (angle);
+//
+//    if (format == F("degrees-latitude") && rest > 90) {
+//      rest -= 360;
+//    }
+//    if (rest >= 0) {
+//      sign = "+";
+//    }
+//    else {
+//      sign = "-";
+//    }
+//
+//    rest = fabs(rest);
+//    d = (int)(rest);
+//    rest = (rest - (float)d) * 60;
+//    m = (int)(rest);
+//    rest = (rest - (float)m) * 60;
+//    s = (int)rest;
+//    Serial.println(sign + String(d) + ":" + String(m) + ":" + String(s));
+//   }
+//}
 //--------------------------------------------------------------------------------------------------------------------
 void rot_x(float alpha) {
 
