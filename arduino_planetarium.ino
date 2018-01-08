@@ -189,13 +189,10 @@ void loop() {
       jd = get_julian_date (day(), month(), year(), utc_hour, minute(), second());//UTC
       //Serial.println("JD:" + String(jd, DEC) + "+" + String(jd_frac, DEC)); // jd = 2457761.375000;
       get_object_position (2, jd, jd_frac);//earth
-      get_object_position (0, jd, jd_frac);
-      get_object_position (1, jd, jd_frac);
-      get_object_position (3, jd, jd_frac);
-      get_object_position (4, jd, jd_frac);
-      get_object_position (5, jd, jd_frac);
-      get_object_position (6, jd, jd_frac);
-      get_object_position (7, jd, jd_frac);
+
+      for (int object = 0; object < 8; object++) { //all planets without earth > 0,1,3,4,5,6,7
+        if (object != 2)get_object_position (object, jd, jd_frac);
+      }
       update_ = true;
     }
   }
@@ -333,10 +330,14 @@ String getparam(int ix) {
 void draw_coord_net() {
 
   SetFilledRect(background_color , 0,  y_size / 2 - 89, 240, 89);
-  //horizontal
-  SetLines(foreground_color, 0, y_size / 2 - 90 , x_size - 20, y_size / 2 - 90 );  // 90 deg:zenith
-  SetLines(foreground_color, 0, y_size / 2 - 60 , x_size - 20, y_size / 2 - 60 );  // 60 deg
-  SetLines(foreground_color, 0, y_size / 2 - 30 , x_size - 20, y_size / 2 - 30 );  // 30 deg
+
+  //draw lines:
+  for (int object = 30; object < 100; object += 30) {
+    SetLines(foreground_color, 0, y_size / 2 - object , x_size - 20, y_size / 2 - object );  ////horizontal lines
+  }
+  //SetLines(foreground_color, 0, y_size / 2 - 90 , x_size - 20, y_size / 2 - 90 );  // 90 deg:zenith
+  //SetLines(foreground_color, 0, y_size / 2 - 60 , x_size - 20, y_size / 2 - 60 );  // 60 deg
+  //SetLines(foreground_color, 0, y_size / 2 - 30 , x_size - 20, y_size / 2 - 30 );  // 30 deg
   SetLines(foreground_color, 0, y_size / 2 , x_size - 1, y_size / 2 );             //  0 deg:horizon
   SetLines(foreground_color, 0, y_size / 2 + 90 , x_size, y_size / 2 + 90 );       // -90 deg:down
   //vertical
@@ -380,7 +381,7 @@ void draw_object(int number) {
   if (altitude >= 0) {//rise object
     if (number == 0)SetFilledCircle(text_color , x , y , body_size);        // Set object
     if (number == 1)SetFilledCircle(GREENYELLOW , x , y , body_size);
-    if (number == 2) SetFilledCircle(YELLOW , x , y , body_size); // sun position
+    if (number == 2)SetFilledCircle(YELLOW , x , y , body_size); // sun position
     if (number == 3)SetFilledCircle(RED , x , y , body_size);
     if (number == 4)SetFilledCircle(MAROON , x , y , body_size);
     if (number == 5) {
@@ -399,10 +400,12 @@ void draw_object(int number) {
     if (x > x_size) x = x - x_size;
     y = ((y - (y_size / 2)) * -1) + y_size / 2;
     //SetCircle(LIGHTGRAY , x , y , 10); // sun opposite position
-    SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
-    SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
-    SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
-    SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
+    SetLines(LIGHTGRAY , x - 6, y - 6, x + 6 , y + 6 ); // sun opposite position
+    SetLines(LIGHTGRAY , x + 6, y - 6, x - 6 , y + 6 ); // sun opposite position
+    //SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
+    //SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
+    //SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
+    //SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
   }
 }
 //--------------------------------------------------------------------------------------------------------------
