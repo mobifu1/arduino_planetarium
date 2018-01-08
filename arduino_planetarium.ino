@@ -153,7 +153,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 1.1-Beta";
+String sw_version = "Version: 1.1-R";
 
 //Display Size:
 int x_size = 240;
@@ -331,31 +331,29 @@ void draw_coord_net() {
 
   SetFilledRect(background_color , 0,  y_size / 2 - 89, 240, 89);
 
-  //draw lines:
-  for (int object = 30; object < 100; object += 30) {
-    SetLines(foreground_color, 0, y_size / 2 - object , x_size - 20, y_size / 2 - object );  ////horizontal lines
+  //draw horizontal lines:
+  for (int object = 0; object < 91; object += 30) {
+    SetLines(foreground_color, 0, y_size / 2 - object , x_size - 20, y_size / 2 - object );  //horizontal lines 0°,30°,60°,90°
   }
-  //SetLines(foreground_color, 0, y_size / 2 - 90 , x_size - 20, y_size / 2 - 90 );  // 90 deg:zenith
-  //SetLines(foreground_color, 0, y_size / 2 - 60 , x_size - 20, y_size / 2 - 60 );  // 60 deg
-  //SetLines(foreground_color, 0, y_size / 2 - 30 , x_size - 20, y_size / 2 - 30 );  // 30 deg
-  SetLines(foreground_color, 0, y_size / 2 , x_size - 1, y_size / 2 );             //  0 deg:horizon
   SetLines(foreground_color, 0, y_size / 2 + 90 , x_size, y_size / 2 + 90 );       // -90 deg:down
-  //vertical
-  SetLines(foreground_color, 0, y_size / 2  , 0, y_size / 2 - 90 );               //   0 deg:azimuth
-  SetLines(foreground_color, 60, y_size / 2 , 60, y_size / 2 - 90 );              //  90 deg:azimuth
-  SetLines(foreground_color, 119, y_size / 2 , 119, y_size / 2 - 90 );            // 180 deg:azimuth
-  SetLines(foreground_color, 179, y_size / 2 , 179, y_size / 2 - 90 );            // 270 deg:azimuth
+
+  //draw vertical lines:
+  for (int object = 0; object < 181; object += 60) {
+    SetLines(foreground_color, object, y_size / 2  , object, y_size / 2 - 90 ); //vertical lines 0°,90°,180°,270°
+  }
   SetLines(foreground_color, 239, y_size / 2 , 239, y_size / 2 - 90 );            // 359 deg:azimuth
+
   //notes horizontal
   ScreenText(foreground_color, x_size - 15, y_size / 2 - 90, 1 , "90");
   ScreenText(foreground_color, x_size - 15, y_size / 2 - 60, 1 , "60");
   ScreenText(foreground_color, x_size - 15, y_size / 2 - 30, 1 , "30");
   //ScreenText(foreground_color, x_size - 15, y_size / 2, 1 , "0");
+
   //notes vertical
   ScreenText(foreground_color, 0 + 2, y_size / 2 - 100, 1 , "N");
   ScreenText(foreground_color, 60, y_size / 2 - 100, 1 , "O");
-  ScreenText(foreground_color, 119, y_size / 2 - 100, 1 , "S");
-  ScreenText(foreground_color, 179, y_size / 2 - 100, 1 , "W");
+  ScreenText(foreground_color, 120, y_size / 2 - 100, 1 , "S");
+  ScreenText(foreground_color, 180, y_size / 2 - 100, 1 , "W");
   ScreenText(foreground_color, 239 - 8, y_size / 2 - 100, 1 , "N");
   //earth ground
   SetFilledRect(earthground_color , 0,  y_size / 2 + 1, 240, 89);
@@ -400,12 +398,12 @@ void draw_object(int number) {
     if (x > x_size) x = x - x_size;
     y = ((y - (y_size / 2)) * -1) + y_size / 2;
     //SetCircle(LIGHTGRAY , x , y , 10); // sun opposite position
-    SetLines(LIGHTGRAY , x - 6, y - 6, x + 6 , y + 6 ); // sun opposite position
-    SetLines(LIGHTGRAY , x + 6, y - 6, x - 6 , y + 6 ); // sun opposite position
-    //SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
-    //SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
-    //SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
-    //SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
+    //SetLines(LIGHTGRAY , x - 6, y - 6, x + 6 , y + 6 ); // sun opposite position
+    //SetLines(LIGHTGRAY , x + 6, y - 6, x - 6 , y + 6 ); // sun opposite position
+    SetLines(LIGHTGRAY , x - 6, y - 6, x - 3, y - 3); // sun opposite position
+    SetLines(LIGHTGRAY , x - 6, y + 6, x - 3, y + 3); // sun opposite position
+    SetLines(LIGHTGRAY , x + 6, y + 6, x + 3, y + 3); // sun opposite position
+    SetLines(LIGHTGRAY , x + 6, y - 6, x + 3, y - 3); // sun opposite position
   }
 }
 //--------------------------------------------------------------------------------------------------------------
