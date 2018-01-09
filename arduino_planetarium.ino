@@ -167,7 +167,7 @@ void setup() {
   tft.fillScreen(BLACK);
   ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
   Serial.begin(9600);
-  Serial.println(sw_version);
+  //Serial.println(sw_version);
 
 }
 //--------------------------------------------------------------------------------------------------------------
@@ -870,6 +870,7 @@ void calc_azimuthal_position(float ra, float dec, float lat, float sidereal_time
   altitude *= deg;//0=horizon, 90=zenith, -90=down
   object_position[number][0] = azimuth; // azimuth, altitude, distance, bodysize
   object_position[number][1] = altitude;
+  object_position[number][2] = dis;
 
   //Serial.println("azimuth:" + String(azimuth, DEC));
   //Serial.println("altitude:" + String(altitude, DEC));
