@@ -61,7 +61,8 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 //--------------------------------------------
 //------- DATE-TIME --------------------------
 //--------------------------------------------
-#include <Time.h>
+//#include <Time.h>
+#include <TimeLib.h>
 #include <Timezone.h>
 TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
 TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
@@ -153,7 +154,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 1.1-R";
+String sw_version = "Version: 1.2-Beta";
 
 //Display Size:
 int x_size = 240;
@@ -215,9 +216,9 @@ void gui_planetarium() {
 
   color_set(object_position[2][1]);
   draw_coord_net();
-  draw_Information();
   draw_star_map(1);
   draw_all_objects();
+  draw_Information();
 }
 //##############################################################################################################
 //##############################################################################################################
@@ -358,7 +359,7 @@ void draw_coord_net() {
   //earth ground
   SetFilledRect(earthground_color , 0,  y_size / 2 + 1, 240, 89);
   //info window
-  SetFilledRect(BLACK , 0,  241, 240, 79);
+  SetFilledRect(BLACK , 0,  251, 240, 69);
 }
 //--------------------------------------------------------------------------------------------------------------
 void draw_object(int number) {
@@ -484,47 +485,17 @@ void draw_Information() {// text info
   ScreenText(text_color, 5, 5, 1 , s);
   ScreenText(text_color, 130, 5, 1 , "N" + String(lat, 2) + "/E" + String(lon, 2));
 
-  float az = object_position[2][0];
-  float alt = object_position[2][1];
-  SetFilledRect(BLACK , 0, 260, 239, 8);
-  ScreenText(WHITE, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
+  //float az = object_position[2][0];
+  //float alt = object_position[2][1];
+  //SetFilledRect(BLACK , 0, 260, 239, 8);
+  //ScreenText(WHITE, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
-  //rise next object:
-  float alt_object = -20;
-  int object_number = -1;
-
-  for (int i = 0 ; i < 8; i++) {
-    float altitude = object_position[i][1];
-    float azimuth = object_position[i][0];
-    if (altitude < 0 && altitude > -20 && azimuth > 0 && azimuth < 180) {
-      if (altitude >= alt_object) {
-        alt_object = altitude;
-        object_number = i;
-      }
-    }
-  }
-  SetFilledRect(BLACK, 0, 275, 239, 8);
-  if (object_number > -1) {
-    ScreenText(WHITE, 5, 275, 1 , object_name[object_number]  + ": next rise");
-  }
-
-  //set next object:
-  alt_object = 20;
-  object_number = -1;
-
-  for (int i = 0 ; i < 8; i++) {
-    float altitude = object_position[i][1];
-    float azimuth = object_position[i][0];
-    if (altitude > 0 && altitude < 20 && azimuth > 180 && azimuth < 360) {
-      if (altitude <= alt_object) {
-        alt_object = altitude;
-        object_number = i;
-      }
-    }
-  }
-  SetFilledRect(BLACK, 0, 290, 239, 8);
-  if (object_number > -1) {
-    ScreenText(WHITE, 5, 290, 1 , object_name[object_number]  + ": next set");
+  //object description:
+  for (int i = 0 ; i < 8; i++) {//                                             o
+    int x_pos = tft_position[i][0]; //x                                        |
+    int y_pos = tft_position[i][1]; //y                                        |
+    SetLines(WHITE , x_pos, y_pos + 7, x_pos, 251 + (8 * i));   //             |
+    ScreenText(WHITE, x_pos, 251 + (8 * i), 1 , object_name[i]);//             Venus
   }
 }
 //--------------------------------------------------------------------------------------------------------------
