@@ -61,8 +61,8 @@ Adafruit_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 //--------------------------------------------
 //------- DATE-TIME --------------------------
 //--------------------------------------------
-//#include <Time.h>
-#include <TimeLib.h>
+#include <Time.h>
+//#include <TimeLib.h>
 #include <Timezone.h>
 TimeChangeRule CEST = {"", Last, Sun, Mar, 2, 120};
 TimeChangeRule CET = {"", Last, Sun, Oct, 3, 60};
@@ -485,16 +485,16 @@ void draw_Information() {// text info
   ScreenText(text_color, 5, 5, 1 , s);
   ScreenText(text_color, 130, 5, 1 , "N" + String(lat, 2) + "/E" + String(lon, 2));
 
-  //float az = object_position[2][0];
-  //float alt = object_position[2][1];
-  //SetFilledRect(BLACK , 0, 260, 239, 8);
-  //ScreenText(WHITE, 5, 260, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
+  float az = object_position[2][0];
+  float alt = object_position[2][1];
+  SetFilledRect(background_color , 0, 20, 239, 8);
+  ScreenText(text_color, 5, 20, 1 , "Sun: " + String(az, 1) + " / " + String(alt, 1));
 
   //object description:
   for (int i = 0 ; i < 8; i++) {//                                             o
     int x_pos = tft_position[i][0]; //x                                        |
     int y_pos = tft_position[i][1]; //y                                        |
-    SetLines(WHITE , x_pos, y_pos + 7, x_pos, 251 + (8 * i));   //             |
+    SetLines(WHITE , x_pos, y_pos + 7, x_pos, 245 + (8 * i));   //             |
     ScreenText(WHITE, x_pos, 251 + (8 * i), 1 , object_name[i]);//             Venus
   }
 }
