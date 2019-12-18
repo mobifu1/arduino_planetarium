@@ -154,7 +154,7 @@ int tft_position[8][2] = {//x, y
 };
 
 //Version:
-String sw_version = "Version: 1.2-Beta";
+String sw_version = "Version: 1.2-RC";
 
 //Display Size:
 int x_size = 240;
@@ -167,6 +167,7 @@ void setup() {
   tft.begin(0x9341);
   tft.fillScreen(BLACK);
   ScreenText(WHITE, 5, 5, 1 , sw_version); // to big for flash 32.256 Kbyte
+  ScreenText(WHITE, 5, 20, 1 , "wait for gps"); // to big for flash 32.256 Kbyte
   Serial.begin(9600);
   //Serial.println(sw_version);
 
